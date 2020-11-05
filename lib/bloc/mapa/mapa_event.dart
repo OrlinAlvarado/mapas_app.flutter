@@ -16,6 +16,15 @@ class OnNuevaUbicacion extends MapaEvent{
   
 }
 
+class OnCrearRutaInicioDestino extends MapaEvent {
+  final List<LatLng> rutaCoordenadas;
+  final double distancia;
+  final double duracion;
+
+  OnCrearRutaInicioDestino(this.rutaCoordenadas, this.distancia, this.duracion);
+  
+}
+
 class OnMovioMapa extends MapaEvent{
   final LatLng centroMapa;
 
