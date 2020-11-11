@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:mapas_app/bloc/mi_ubicacion/mi_ubicacion_bloc.dart';
 import 'package:mapas_app/bloc/mapa/mapa_bloc.dart';
+// import 'package:mapas_app/pages/test_marker_page.dart';
 import 'bloc/busqueda/busqueda_bloc.dart';
 
 import 'package:mapas_app/pages/acceso_gps_page.dart';
@@ -24,7 +25,6 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Material App',
-        // home: LoadingPage(),
         home: LoadingPage(),
         routes: {
           'mapa'       : (_) => MapaPage(),

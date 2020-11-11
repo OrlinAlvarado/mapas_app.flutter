@@ -34,7 +34,7 @@ class _BuildMarcadorManual extends StatelessWidget {
               child: IconButton(
                 icon: Icon(Icons.arrow_back, color: Colors.black87,),
                 onPressed: (){
-                  context.bloc<BusquedaBloc>().add( OnDesactivaMarcadorManual());
+                  context.read<BusquedaBloc>().add( OnDesactivaMarcadorManual());
                 },
               ),
             ),
@@ -74,25 +74,42 @@ class _BuildMarcadorManual extends StatelessWidget {
   void calcularDestino( BuildContext context) async {
     calculandoAlerta(context);
     final trafficService = new TrafficService();
-    final mapaBloc = context.bloc<MapaBloc>();
-    final inicio = context.bloc<MiUbicacionBloc>().state.ubicacion;
+    final mapaBloc = context.read<MapaBloc>();
+    final inicio = context.read<MiUbicacionBloc>().state.ubicacion;
     final destino = mapaBloc.state.ubicacionCentral;
+    
+    //Obtener informacion del destino
+    final reverseQueryResponse = await trafficService.getCoordenadasInfo(destino);
+    
     final drivingResponse = await trafficService.getCoordsInicioYDestino(inicio, destino);
     
     final geometry = drivingResponse.routes[0].geometry;
     final duration = drivingResponse.routes[0].duration;
     final distance = drivingResponse.routes[0].distance;
+    final nombreDestino = reverseQueryResponse.features[0].text;
     
     final points = Poly.Polyline.Decode( encodedString: geometry, precision: 6).decodedCoords;
     
     final List<LatLng> rutaCoords = points.map(
       (point) => LatLng(point[0], point[1])
     ).toList();
-    final temp = points;
+    // final temp = points;
     
-    mapaBloc.add(OnCrearRutaInicioDestino(rutaCoords, distance, duration));
+    mapaBloc.add(OnCrearRutaInicioDestino(rutaCoords, distance, duration, nombreDestino));
     Navigator.of(context).pop();
-    context.bloc<BusquedaBloc>().add(OnDesactivaMarcadorManual());
+    context.read<BusquedaBloc>().add(OnDesactivaMarcadorManual());
     
+    //Agregar al historial
+    
+    final busquedaBloc = context.read<BusquedaBloc>();
+    
+    final searchResult = new SearchResult(
+      cancelo: false,
+      position: destino,
+      nombreDestino: nombreDestino,
+      descripcion: reverseQueryResponse.features[0].placeNameEs,
+      manual: true
+    );
+    busquedaBloc.add( OnAgregarHistorial( searchResult ));
   }
 }

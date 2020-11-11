@@ -22,7 +22,7 @@ class BusquedaBloc extends Bloc<BusquedaEvent, BusquedaState> {
         (result) => result.nombreDestino == event.result.nombreDestino
       );
        
-      if(existe == 0)
+      if(existe.length == 0)
       {
         final newHistorial = [ ...state.historial, event.result ];
         yield state.copyWith( historial: newHistorial );

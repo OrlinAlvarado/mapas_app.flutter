@@ -27,8 +27,8 @@ class SearchBar extends StatelessWidget {
         child: GestureDetector(
           onTap: () async {
             
-            final proximidad = context.bloc<MiUbicacionBloc>().state.ubicacion;
-            final historial = context.bloc<BusquedaBloc>().state.historial;
+            final proximidad = context.read<MiUbicacionBloc>().state.ubicacion;
+            final historial = context.read<BusquedaBloc>().state.historial;
             final resultado = await showSearch(
               context: context, 
               delegate: SearchDestination( proximidad, historial )
@@ -59,7 +59,7 @@ class SearchBar extends StatelessWidget {
     if( result.cancelo ) return;
     
     if( result.manual ){
-      context.bloc<BusquedaBloc>().add( OnActivaMarcadorManual());
+      context.read<BusquedaBloc>().add( OnActivaMarcadorManual());
       return;
     }
     
@@ -67,9 +67,9 @@ class SearchBar extends StatelessWidget {
     //Calcular la ruta en base al valor: Result
     final trafficService = new TrafficService();
     
-    final mapaBloc = context.bloc<MapaBloc>();
+    final mapaBloc = context.read<MapaBloc>();
     
-    final inicio  = context.bloc<MiUbicacionBloc>().state.ubicacion;
+    final inicio  = context.read<MiUbicacionBloc>().state.ubicacion;
     final destino = result.position;
     
     final drivingResponse = await trafficService.getCoordsInicioYDestino(inicio, destino);
@@ -77,6 +77,8 @@ class SearchBar extends StatelessWidget {
     final geometry = drivingResponse.routes[0].geometry;
     final duracion = drivingResponse.routes[0].duration;
     final distancia = drivingResponse.routes[0].distance;
+    final nombreDestino = result.nombreDestino;
+    
     
     final points = Poly.Polyline.Decode( encodedString: geometry, precision: 6);
     
@@ -84,13 +86,13 @@ class SearchBar extends StatelessWidget {
       ( point ) => LatLng( point[0], point[1])
     ).toList();
     
-    mapaBloc.add( OnCrearRutaInicioDestino(rutaCoordenadas, distancia, duracion));
+    mapaBloc.add( OnCrearRutaInicioDestino(rutaCoordenadas, distancia, duracion, nombreDestino));
     
     Navigator.of(context).pop();
     
     //Agregar al historial
     
-    final busquedaBloc = context.bloc<BusquedaBloc>();
+    final busquedaBloc = context.read<BusquedaBloc>();
     
     busquedaBloc.add( OnAgregarHistorial( result ));
     

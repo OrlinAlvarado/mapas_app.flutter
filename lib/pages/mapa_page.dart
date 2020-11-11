@@ -15,13 +15,13 @@ class _MapaPageState extends State<MapaPage> {
   
   @override
   void initState() {
-    context.bloc<MiUbicacionBloc>().iniciarSeguimiento();
+    context.read<MiUbicacionBloc>().iniciarSeguimiento();
     super.initState();
   }
   
   @override
   void dispose() {
-    context.bloc<MiUbicacionBloc>().cancelarSeguimiento();
+    context.read<MiUbicacionBloc>().cancelarSeguimiento();
     super.dispose();
   }
 @override
@@ -35,7 +35,6 @@ class _MapaPageState extends State<MapaPage> {
           BlocBuilder<MiUbicacionBloc, MiUbicacionState>(
             builder: (_, state) => crearMapa(state)
           ),
-          //TODO: Hacer el toggle cuando estoy manualmente
           Positioned(
             top: 5,
             child: SearchBar()
@@ -76,6 +75,7 @@ class _MapaPageState extends State<MapaPage> {
           zoomControlsEnabled: false,
           onMapCreated: mapaBloc.initMapa,
           polylines: mapaBloc.state.polylines.values.toSet(),
+          markers: mapaBloc.state.markers.values.toSet(),
           onCameraMove: ( cameraPosition ) {
             mapaBloc.add( OnMovioMapa( cameraPosition.target ));
           }
